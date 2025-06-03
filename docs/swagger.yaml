@@ -1,0 +1,278 @@
+definitions:
+  controllers.AgencyInput:
+    properties:
+      address:
+        type: string
+      contact:
+        type: string
+      email:
+        type: string
+      logo_url:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      tax_id:
+        type: string
+    type: object
+  controllers.LandlordInput:
+    properties:
+      address:
+        type: string
+      agency_id:
+        type: integer
+      contact:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+  models.ForgotPasswordInput:
+    properties:
+      contact:
+        type: string
+    type: object
+  models.LoginInput:
+    properties:
+      contact:
+        type: string
+      password:
+        type: string
+    type: object
+  models.ResetPasswordInput:
+    properties:
+      id:
+        type: integer
+      otp:
+        type: string
+      password:
+        type: string
+    type: object
+  models.Response:
+    properties:
+      data: {}
+      message:
+        type: string
+      success:
+        type: boolean
+    type: object
+  models.Verify:
+    properties:
+      id:
+        type: integer
+      otp:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /:
+    get:
+      description: Health-check endpoint for the API
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Server status check
+      tags:
+      - status
+  /auth/forgot-password:
+    post:
+      consumes:
+      - application/json
+      description: Sends an OTP to the client to reset password
+      parameters:
+      - description: Contact Information
+        in: body
+        name: forgotPassword
+        required: true
+        schema:
+          $ref: '#/definitions/models.ForgotPasswordInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OTP sent successfully
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Invalid request payload
+          schema:
+            type: string
+        "404":
+          description: Client not found
+          schema:
+            type: string
+      summary: Forgot password
+      tags:
+      - Client
+  /auth/login:
+    post:
+      consumes:
+      - application/json
+      description: Logs in a client by validating contact and password
+      parameters:
+      - description: Login credentials
+        in: body
+        name: credentials
+        required: true
+        schema:
+          $ref: '#/definitions/models.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Login successful with token
+          schema:
+            $ref: '#/definitions/models.Response'
+        "401":
+          description: Invalid credentials or unverified landlord
+          schema:
+            type: string
+        "404":
+          description: Landlord not found
+          schema:
+            type: string
+      summary: Client login
+      tags:
+      - Client
+  /auth/register/agency:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new agency with contact, email, password, address,
+        and tax ID
+      parameters:
+      - description: Agency Registration Input
+        in: body
+        name: agency
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.AgencyInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Agency created successful
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or missing fields
+          schema:
+            type: string
+        "409":
+          description: Email or contact already exists
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Agency Account Creation
+      tags:
+      - Agency
+  /auth/register/landlord:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new landlord with contact, email, password, and address.
+        Optionally can be associated with an agency.
+      parameters:
+      - description: Landlord Registration Input
+        in: body
+        name: landlord
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.LandlordInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Landlord created successful
+          schema:
+            additionalProperties: true
+            type: object
+        "400":
+          description: Invalid request or missing fields
+          schema:
+            type: string
+        "409":
+          description: Email or contact already exists
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Landlord Account Creation
+      tags:
+      - Landlord
+  /auth/reset-password:
+    post:
+      consumes:
+      - application/json
+      description: Resets a client's password using a valid OTP code
+      parameters:
+      - description: Reset password request
+        in: body
+        name: resetPassword
+        required: true
+        schema:
+          $ref: '#/definitions/models.ResetPasswordInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password reset successful
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Invalid request payload
+          schema:
+            type: string
+        "401":
+          description: Invalid or expired OTP
+          schema:
+            type: string
+      summary: Reset password
+      tags:
+      - Client
+  /auth/verify:
+    post:
+      consumes:
+      - application/json
+      description: Verifies a client's account using their OTP
+      parameters:
+      - description: OTP Verification Input
+        in: body
+        name: verification
+        required: true
+        schema:
+          $ref: '#/definitions/models.Verify'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Client verified successfully
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Invalid request or bad OTP
+          schema:
+            type: string
+        "404":
+          description: OTP not found
+          schema:
+            type: string
+      summary: Verify client
+      tags:
+      - Client
+swagger: "2.0"

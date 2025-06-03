@@ -1,0 +1,1 @@
+ALTER TABLE clients ADD COLUMN name VARCHAR(255)
