@@ -44,7 +44,7 @@ tidy:
 deploy: build
 	@echo "Deploying..."
 	sudo cp $(BUILD_DIR)/$(APP_NAME) $(DEPLOY_DIR)/
-	sudo chown identity-service:texkin $(DEPLOY_DIR)/$(APP_NAME)
+	sudo chown identity-service:identity-service $(DEPLOY_DIR)/$(APP_NAME)
 	sudo chmod 750 $(DEPLOY_DIR)/$(APP_NAME)
 	sudo systemctl restart $(SERVICE_NAME)
 	@echo "Deployment complete."
