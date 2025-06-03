@@ -113,6 +113,34 @@ paths:
       summary: Forgot password
       tags:
       - Client
+  /auth/get-token:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Client ID
+        in: query
+        name: client_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Token sent successfully
+          schema:
+            $ref: '#/definitions/models.Response'
+        "400":
+          description: Invalid request payload
+          schema:
+            type: string
+        "404":
+          description: Client not found
+          schema:
+            type: string
+      summary: Generate Token
+      tags:
+      - Client
   /auth/login:
     post:
       consumes:
