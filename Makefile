@@ -46,14 +46,16 @@ tidy:
 	go mod tidy
 
 # Deploy to systemd directory and restart the service
+# Deploy to systemd directory and restart the service
 .PHONY: deploy
 deploy: swagger build
 	@echo "Deploying..."
+	sudo systemctl stop $(SERVICE_NAME)
 	sudo cp $(BUILD_DIR)/$(APP_NAME) $(DEPLOY_DIR)/
-	sudo cp -r docs $(DEPLOY_DIR)/
-	sudo chown -R identity-service:identity-service $(DEPLOY_DIR)/
+	sudo chown identity-service:identity-service $(DEPLOY_DIR)/$(APP_NAME)
 	sudo chmod 750 $(DEPLOY_DIR)/$(APP_NAME)
-	sudo systemctl restart $(SERVICE_NAME)
+	sudo systemctl start $(SERVICE_NAME)
 	@echo "Deployment complete."
+
 
 
