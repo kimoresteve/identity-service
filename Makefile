@@ -12,7 +12,8 @@ all: build
 .PHONY: build
 build:
 	@echo "Building..."
-	go build -o $(BUILD_DIR)/$(APP_NAME) main.go
+	@which go || echo "ERROR: 'go' command not found"
+	go build -o $(BUILD_DIR)/$(APP_NAME) main.go | tee build.log
 
 # Run the app (local/dev)
 .PHONY: run
