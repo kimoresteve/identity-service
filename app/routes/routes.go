@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 	"github.com/kimoresteve/identity-service/app/controllers"
+	middleware "github.com/kimoresteve/identity-service/app/middlewares"
 	httpSwagger "github.com/swaggo/http-swagger"
 	"log"
 	"net/http"
@@ -38,6 +39,9 @@ func (a *App) setRoutes() {
 
 	authRouter := a.Router.PathPrefix("/auth").Subrouter()
 	//a.Router.HandleFunc("/auth/register", a.Controller.Register).Methods("POST")
+	//authRouter.HandleFunc("/get-token", a.Controller.GenerateToken).Methods("GET")
+
+	a.Router.Handle("/auth/get-token/{id}", middleware.JWTMiddleware(http.HandlerFunc(a.Controller.GenerateToken))).Methods("GET")
 	authRouter.HandleFunc("/register/agency", a.Controller.RegisterAgency).Methods("POST")
 	authRouter.HandleFunc("/register/agency/landlord", a.Controller.Login).Methods("POST")
 	authRouter.HandleFunc("/register/landlord", a.Controller.RegisterLandlord).Methods("POST")

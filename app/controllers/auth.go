@@ -10,6 +10,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -187,6 +188,53 @@ func (c *Controller) Login(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(response)
 
+}
+
+// GenerateToken creates a token for client
+// @Summary Generate Token
+// @Tags Client
+// @Accept json
+// @Produce json
+// @Param client_id query uint true "Client ID"
+// @Success 200 {object} models.Response "Token sent successfully"
+// @Failure 400 {string} string "Invalid request payload"
+// @Failure 404 {string} string "Client not found"
+// @Router /auth/get-token [get]
+func (c *Controller) GenerateToken(w http.ResponseWriter, r *http.Request) {
+
+	clientIDStr := r.URL.Query().Get("id")
+	if clientIDStr == "" {
+		http.Error(w, "client_id parameter is required", http.StatusBadRequest)
+		return
+	}
+
+	// Convert clientID to uint
+	clientID, err := strconv.ParseUint(clientIDStr, 10, 32)
+	if err != nil {
+		http.Error(w, "Invalid client_id format", http.StatusBadRequest)
+		return
+	}
+
+	// Generate JWT token
+	token, err := middleware.GenerateJWT(uint(clientID))
+	if err != nil {
+		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
+		return
+	}
+
+	// Prepare response
+	response := models.Response{
+		Success: true,
+		Message: "Token generated successfully",
+		Data: map[string]interface{}{
+			"token": token,
+			//"expires_in": int(middleware.TokenTTL.Seconds()),
+		},
+	}
+
+	// Send response
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 }
 
 // ForgotPassword sends a reset OTP code to the Client.

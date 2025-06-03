@@ -12,7 +12,7 @@ import (
 )
 
 // JWT configuration from environment variables
-var (
+var  (
 	jwtSecret []byte
 	tokenTTL  time.Duration
 )
