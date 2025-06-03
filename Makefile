@@ -1,7 +1,7 @@
 # Project variables
 APP_NAME := identity-service
 BUILD_DIR := app
-DEPLOY_DIR := /var/deployment/identity-service
+DEPLOY_DIR := /var/depolyment/identity-service
 SERVICE_NAME := identity-service
 
 # Default target
